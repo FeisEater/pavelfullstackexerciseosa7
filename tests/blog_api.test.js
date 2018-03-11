@@ -2,14 +2,30 @@ const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const { initialBlogs, formatBlog, blogsInDb } = require('./test_helper')
+const jwt = require('jsonwebtoken')
+
+let token
+let loggedIn
 
 beforeAll(async () => {
   await Blog.remove({})
-
+  
   const blogObjects = initialBlogs.map(blog => new Blog(blog))
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+  loggedIn = await new User({
+    username: 'username',
+    name: 'name',
+    passwordHash: '123',
+    adult: false
+  })
+  const userForToken = {
+    username: loggedIn.username,
+    id: loggedIn._id
+  }
+  token = `bearer ${jwt.sign(userForToken, 'secret')}`
 })
 
 describe('GET', async () => {
@@ -55,6 +71,7 @@ describe('POST', async () => {
       
         await api
           .post('/api/blogs')
+          .set('Authorization', token)
           .send(newBlog)
           .expect(201)
           .expect('Content-Type', /application\/json/)
@@ -74,6 +91,7 @@ describe('POST', async () => {
       
         await api
           .post('/api/blogs')
+          .set('Authorization', token)
           .send(newBlog)
           .expect(201)
           .expect('Content-Type', /application\/json/)
@@ -97,6 +115,7 @@ describe('POST', async () => {
       
         await api
           .post('/api/blogs')
+          .set('Authorization', token)
           .send(newBlog)
           .expect(400)
       
@@ -113,6 +132,7 @@ describe('POST', async () => {
       
         await api
           .post('/api/blogs')
+          .set('Authorization', token)
           .send(newBlog)
           .expect(400)
       
@@ -128,7 +148,8 @@ describe('DELETE', async () => {
             title: "Blog title5",
             author: "Me5",
             url: "cool5.com",
-            likes: 2
+            likes: 2,
+            user: loggedIn
         })
         await testBlog.save()
     })
@@ -137,6 +158,7 @@ describe('DELETE', async () => {
         const blogsInDatabase = await blogsInDb()
         await api
           .delete(`/api/blogs/${testBlog._id}`)
+          .set('Authorization', token)
           .expect(204)
         const blogsAfter = await blogsInDb()
         expect(blogsAfter).not.toContainEqual(testBlog)
@@ -147,6 +169,7 @@ describe('DELETE', async () => {
         const blogsInDatabase = await blogsInDb()
         await api
           .delete('/api/blogs/badurl')
+          .set('Authorization', token)
           .expect(400)
         const blogsAfter = await blogsInDb()
         expect(blogsAfter).toContainEqual(formatBlog(testBlog))
@@ -187,6 +210,7 @@ describe('PUT', async () => {
       
         await api
           .put(`/api/blogs/${testBlog._id}`)
+          .set('Authorization', token)
           .send(editedBlog)
           .expect(200)
           .expect('Content-Type', /application\/json/)
@@ -205,6 +229,7 @@ describe('PUT', async () => {
       
         await api
           .put(`/api/blogs/${testBlog._id}`)
+          .set('Authorization', token)
           .send(editedBlog)
           .expect(200)
           .expect('Content-Type', /application\/json/)
@@ -227,6 +252,7 @@ describe('PUT', async () => {
       
         await api
           .put(`/api/blogs/${testBlog._id}`)
+          .set('Authorization', token)
           .send(editedBlog)
           .expect(200)
           .expect('Content-Type', /application\/json/)
@@ -252,6 +278,7 @@ describe('PUT', async () => {
 
         await api
           .put('/api/blogs/badurl')
+          .set('Authorization', token)
           .send(editedBlog)
           .expect(400)
 
