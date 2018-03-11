@@ -1,0 +1,28 @@
+{
+  "name": "osa4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node index.js",
+    "watch": "cross-env NODE_ENV=development nodemon index.js",
+    "lint": "eslint .",
+    "test": "cross-env NODE_ENV=test jest --verbose"
+  },
+  "author": "Pavel Smirnov",
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^5.1.3",
+    "dotenv": "^5.0.0",
+    "jest": "^22.3.0",
+    "nodemon": "^1.14.12",
+    "supertest": "^3.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.1",
+    "mongoose": "^5.0.5"
+  }
+}
