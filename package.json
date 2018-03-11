@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node index.js",
-    "watch": "cross-env NODE_ENV=development nodemon index.js",
+    "start": "NODE_ENV=production node index.js",
+    "watch": "NODE_ENV=development nodemon index.js",
     "lint": "eslint .",
-    "test": "cross-env NODE_ENV=test jest --verbose"
+    "test": "NODE_ENV=test jest --verbose"
   },
   "author": "Pavel Smirnov",
   "license": "ISC",
